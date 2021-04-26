@@ -21,21 +21,21 @@
     <header>
         <nav class="navbar navbar-expand-lg">
             <div class="container">
-                <a class="navbar-brand" href="#">Twitter Clone</a>
+                <a class="navbar-brand" href="{% url 'accounts:home' %}">Simple Scheduler</a>
                 <ul class="nav align-items-center">
                     {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a href="#" class="nav-link">Logout</a>
+                        <a href="{% url 'accounts:logout' %}" class="nav-link">Logout</a>
                     </li>
                     <li class="nav-item">
                         {{ request.user.username }}
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a href="#" class="nav-link">ログイン</a>
+                        <a href="{% url 'accounts:login' %}" class="nav-link">ログイン</a>
                     </li>
                     <li class="nav-item">
-                        <a href="#" class="btn btn-primary shadow-sm rounded">登録</a>
+                        <a href="{% url 'accounts:signup' %}" class="btn btn-primary shadow-sm rounded">登録</a>
                     </li>
                     {% endif %}
                 </ul>

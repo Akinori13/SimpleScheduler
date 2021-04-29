@@ -93,3 +93,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self):
         return self.username
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    text = models.TextField(max_length=140, blank=True, null=True)
+    profile_image = models.ImageField(default='profile/default_icon.png', upload_to='profile/icon_pics')
+    header_image = models.ImageField(default='profile/default_header.png', upload_to='profile/header_pics')
+    updated_at = models.DateTimeField(auto_now=True)

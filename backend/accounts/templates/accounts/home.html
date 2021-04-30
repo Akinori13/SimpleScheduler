@@ -6,7 +6,7 @@
 {% block content %}
 <div class="container container d-flex justify-content-center">
     <h1>Home</h1>
-    <a href="{% url 'accounts:profile_detail' request.user.profile.id %}">
+    <a href="{% url 'accounts:profile_detail' user.profile.id %}">
         Profile
     </a>
 </div>

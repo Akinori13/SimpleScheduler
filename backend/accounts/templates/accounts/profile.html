@@ -1,0 +1,16 @@
+{% extends "common/base.html" %}
+{% load widget_tweaks %}
+
+{% block titele %}Home{{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container container d-flex justify-content-center">
+    <ul>
+        <li>{{ user.uuid }}</li>
+        <li>{{ user.email }}</li>
+        <li>{{ profile.id }}</li>
+    </ul>
+    <img src='{{ profile.header_image.url }}' width=200>
+    <img src='{{ profile.icon_image.url }}' width=200>
+</div>
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from .forms import CustomUserCreationForm
 from django.contrib.auth import login
-from .models import User
+from .models import Profile, User
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -21,3 +21,8 @@ def signup(request):
 
 class HomeView(LoginRequiredMixin, generic.TemplateView):
     template_name="accounts/home.html"
+
+class ProfileView(LoginRequiredMixin, generic.DetailView):
+    model = Profile
+    template_name = 'accounts/profile.html'
+    context_object_name = 'profile'

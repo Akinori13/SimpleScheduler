@@ -97,6 +97,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     text = models.TextField(max_length=140, blank=True, null=True)
-    profile_image = models.ImageField(default='profile/default_icon.png', upload_to='profile/icon_pics')
-    header_image = models.ImageField(default='profile/default_header.png', upload_to='profile/header_pics')
+    icon_image = models.ImageField(default='profile/default_icon.jpg', upload_to='profile/icon_pics')
+    header_image = models.ImageField(default='profile/default_header.jpg', upload_to='profile/header_pics')
     updated_at = models.DateTimeField(auto_now=True)

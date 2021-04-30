@@ -53,7 +53,7 @@ class User(AbstractBaseUser, PermissionsMixin):
             'unique': _("A user with that username already exists."),
         },
     )
-    email = models.EmailField(_('email address'), blank=True)
+    email = models.EmailField(_('email address'), blank=True, null=True)
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
@@ -74,7 +74,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'username'
-    REQUIRED_FIELDS = ['email', ]
+    REQUIRED_FIELDS = []
 
     class Meta:
         verbose_name = _('user')
@@ -96,7 +96,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    text = models.TextField(max_length=140, blank=True, null=True)
+    text = models.TextField(max_length=140, blank=True, null=True, default='')
     icon_image = models.ImageField(default='profile/default_icon.jpg', upload_to='profile/icon_pics')
     header_image = models.ImageField(default='profile/default_header.jpg', upload_to='profile/header_pics')
     updated_at = models.DateTimeField(auto_now=True)

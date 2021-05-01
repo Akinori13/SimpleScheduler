@@ -5,7 +5,8 @@ from .models import User
 
 class CustomUserCreationForm(UserCreationForm):
     email = forms.EmailField(
-        help_text='こちらのEmailは後から変更できます。'
+        help_text='こちらのEmailは後から変更できます。',
+        required=False
         )
 
     class Meta(UserCreationForm.Meta):

@@ -1,0 +1,41 @@
+{% extends "common/base.html" %}
+{% load widget_tweaks %}
+
+{% block titele %}プロフィール{{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <figure>
+                <img src='{{ profile.header_image.url }}' class="figure-img img-fluid rounded" style="max-height: 80px; width: 100%;object-fit: cover;">
+            </figure>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 d-flex">
+            <figure>
+                <img src='{{ profile.icon_image.url }}' class="figure-img img-fluid rounded-circle" style="height: 120px; width: 120px; object-fit: cover;">
+            </figure>
+            <div class="profile ps-4 flex-grow-1">
+                <div class="profile_header d-flex align-items-center justify-content-between">
+                    <h2>{{ profile.user.username }}</h2>
+                    <div>
+                        {% if profile.user.uuid == request.user.uuid %}
+                        <a href="{% url 'accounts:profile_update' user.profile.id %}" class="btn btn-sm btn-outline-info">編集</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="profile_content">
+                    <p>{{ profile.text }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <hr>
+        </div>
+    </div>
+</div>
+{% endblock %}

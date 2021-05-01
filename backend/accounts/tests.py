@@ -1,10 +1,12 @@
-from django.test import TestCase
+import sys
+import time
 
+from django.test import TestCase
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse
 
-from .models import User
+from .models import User, Profile
 from .forms import CustomUserCreationForm
 
 
@@ -151,6 +153,7 @@ class TestLogin(TestCase):
         })
         self.assertTrue(response.context['form'].non_field_errors)
 
+
 class TestLogout(TestCase):
     def setUp(self):
         self.test_user = User.objects.create_user(
@@ -184,3 +187,35 @@ class TestHome(TestCase):
         response = self.get()
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'accounts/home.html')
+
+
+class TestProfile(TestCase):
+    def setUp(self):
+        User.objects.create_user(
+            username='testuser2',
+            email='test@user.com',
+            password='test_password',
+        )
+        self.test_user = User.objects.get(username='testuser2')
+        self.client.force_login(self.test_user)
+    
+    def test_profile_is_created_when_user_is_created(self):
+        self.assertTrue(Profile.objects.filter(user=self.test_user).exists())
+
+    def test_profile_view(self):
+        response = self.client.get(reverse('accounts:profile_detail', args=[self.test_user.profile.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'accounts/profile.html')
+        self.assertContains(response, self.test_user.profile.user.username)
+    
+    def test_profile_update_view(self):
+        response = self.client.post(
+                reverse('accounts:profile_update', args=[self.test_user.profile.id]), 
+                {
+                    'text': 'HelloWorldTest'
+                }
+            )
+        self.assertRedirects(response, reverse('accounts:profile_detail', args=[self.test_user.profile.id]))
+
+        self.test_user = User.objects.get(username='testuser2')
+        self.assertEqual(self.test_user.profile.text, 'HelloWorldTest')

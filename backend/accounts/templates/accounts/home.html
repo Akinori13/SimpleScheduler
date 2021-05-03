@@ -4,81 +4,10 @@
 {% block titele %}Home{{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <h1>Home</h1>
-        <ul>
-            <li>
-                <a href="{% url 'accounts:profile_detail' user.profile.id %}">Profile</a>
-            </li>
-            <li>
-                <a href="{% url 'speaks:speak_create' %}">Speak</a>
-            </li>
-        </ul>
-    </div>
-
-    <div class="row">
-        {% for speak in speaks %}
-        <div class="col-12 d-flex px-4">
-            <div class="icon-wrapper px-2">
-                <a href="{% url 'accounts:profile_detail' speak.user.profile.id %}">
-                    <img src='{{ speak.user.profile.icon_image.url }}' class="figure-img img-fluid rounded-circle" style="height: 40px; width: 40px; object-fit: cover;">
-                </a>
-            </div>
-            <div class="content-wrapper flex-grow-1 px-2">
-                <div class="content-header d-flex justify-content-between align-items-center w-100">
-                    <a href="{% url 'accounts:profile_detail' speak.user.profile.id %}" class="text-body fw-bold text-decoration-none">{{ speak.user }}</a>
-                    <div>
-                        <i class="fas fa-ellipsis-h"></i>
-                    </div>
-                </div>
-                <p>{{ speak.content|linebreaksbr }}</p>
-                <div class="content-footer">
-                    <ul class="d-flex list-unstyled justify-content-between align-items-center w-100 m-0">
-                        <li><i class="far fa-comments"></i></li>
-                        <li><i class="fas fa-retweet"></i></li>
-                        <li><i class="far fa-heart"></i></li>
-                        <li><i class="fas fa-share-alt"></i></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="col-12">
-            <hr>
-        </div>
-        {% endfor %}
-    </div>
-    <div class="row">
-        <div class="col-12">
-            <ul class="pagination">
-                <!-- 前へ の部分 -->
-                {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                {% endif %}
-            
-                <!-- 数字の部分 -->
-                {% for num in page_obj.paginator.page_range %}
-                    {% if page_obj.number == num %}
-                        <li class="page-item active"><a class="page-link" href="#!">{{ num }}</a></li>
-                    {% else %}
-                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-                    {% endif %}
-                {% endfor %}
-            
-                <!-- 次へ の部分 -->
-                {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
+<div class="container container d-flex justify-content-center">
+    <h1>Home</h1>
+    <a href="{% url 'accounts:profile_detail' user.profile.id %}">
+        Profile
+    </a>
 </div>
 {% endblock %}

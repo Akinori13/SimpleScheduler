@@ -7,4 +7,4 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 COPY run.sh .
 RUN chmod 755 run.sh
-ENTRYPOINT run.sh
+ENTRYPOINT ["/code/run.sh"]

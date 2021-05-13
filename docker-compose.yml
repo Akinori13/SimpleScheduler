@@ -3,9 +3,10 @@ version: '3'
 services:
   web:
     build: ./infra/python
+    working_dir: /code/backend
     command: python3 manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./backend:/code
+      - ./backend:/code/backend
     ports:
       - "8000:8000"
     depends_on:

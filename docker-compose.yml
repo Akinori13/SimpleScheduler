@@ -2,14 +2,28 @@ version: '3'
 
 services:
   web:
-    build: .
-    command: python3 manage.py runserver 0.0.0.0:8000
+    build: ./infra/nginx
+    volumes: 
+      - ./logs/nginx:/var/log/nginx
+    ports: 
+      - "80:80"
+    depends_on:
+      - app
+    networks:
+      - front
+  app:
+    build: ./infra/python
+    working_dir: /code/backend
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      - ./backend:/code
+      - ./backend:/code/backend
     ports:
       - "8000:8000"
     depends_on:
       - db
+    networks:
+      - front
+      - back
   db:
     image: postgres
     volumes:
@@ -18,5 +32,13 @@ services:
       - 'POSTGRES_DB=postgres'
       - 'POSTGRES_USER=postgres'
       - 'POSTGRES_PASSWORD=postgres'
+    networks:
+      - back
 volumes:
-  postgres_data:
+  postgres_data:    
+
+networks:
+  front:
+    external: false
+  back:
+    external: false

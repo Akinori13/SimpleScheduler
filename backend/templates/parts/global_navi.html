@@ -1,0 +1,20 @@
+{% load menu_link_tags %}
+
+<div class="container">
+    <div class="row">
+        <ul class="d-flex list-unstyled">
+            <li class="px-2">
+                {% url 'accounts:home' as url_accounts_home %}
+                {% menu_link url_accounts_home request.get_full_path "Home" %}
+            </li>
+            <li class="px-2">
+                {% url 'accounts:profile_detail' request.user.profile.id as url_accounts_profile_detail %}
+                {% menu_link url_accounts_profile_detail request.get_full_path "Profile" %}
+            </li>
+            <li class="px-2">
+                {% url 'speaks:speak_create' as url_speaks_speak_create %}
+                {% menu_link url_speaks_speak_create request.get_full_path "Speak" %}
+            </li>
+        </ul>
+    </div>
+</div>

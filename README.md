@@ -7,8 +7,8 @@
 **In the future, I will deploy this application to AWS ECS, RDS and S3.**
 
 ## Functions
-- [✗] Signup Function
-- [✗] Profile Function
+- [x] Signup Function
+- [x] Profile Function
 - [ ] Speak Function (Like Twetter)
 - [ ] Update Account Function
 - [ ] Social Auth Function

@@ -67,6 +67,9 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.media'
             ],
+            'libraries':{
+            'menu_link_tags': 'templatetags.menu_link_tags',
+            }
         },
     },
 ]

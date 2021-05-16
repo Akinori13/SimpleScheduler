@@ -4,19 +4,9 @@
 {% block titele %}Home{{ block.super }}{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="row">
-        <h1>Home</h1>
-        <ul>
-            <li>
-                <a href="{% url 'accounts:profile_detail' user.profile.id %}">Profile</a>
-            </li>
-            <li>
-                <a href="{% url 'speaks:speak_create' %}">Speak</a>
-            </li>
-        </ul>
-    </div>
+{% include "parts/global_navi.html" %}
 
+<div class="container">
     <div class="row">
         {% for speak in speaks %}
         <div class="col-12 d-flex px-4">

@@ -11,4 +11,7 @@ class Speak(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
+        return self.content
+    
+    def excerpted_content(self):
         return self.content[:20]

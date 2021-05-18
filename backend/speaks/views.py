@@ -11,7 +11,7 @@ class OnlyYouMixin(UserPassesTestMixin):
         user = self.request.user
         return user.pk == self.kwargs['pk']
 
-class SpeakCreateView(LoginRequiredMixin, OnlyYouMixin, CreateView):
+class SpeakCreateView(LoginRequiredMixin, CreateView):
     model = Speak
     fields = ['content']
     template_name = 'speaks/speak_create.html'

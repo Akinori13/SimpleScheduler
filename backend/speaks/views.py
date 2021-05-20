@@ -1,15 +1,9 @@
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic.edit import DeleteView
 
 from .models import Speak
-
-class OnlyYouMixin(UserPassesTestMixin):
-    raise_exception = False     # set True if raise 403_Forbidden
-
-    def test_func(self):
-        user = self.request.user
-        return user.pk == self.kwargs['pk']
 
 class SpeakCreateView(LoginRequiredMixin, CreateView):
     model = Speak
@@ -20,3 +14,11 @@ class SpeakCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
+
+class SpeakDeleteView(LoginRequiredMixin, DeleteView):
+    model = Speak
+    template_name = 'speaks/speak_delete.html'
+    success_url = reverse_lazy('accounts:home')
+
+    def get_queryset(self):
+        return self.model.objects.filter(user=self.request.user)

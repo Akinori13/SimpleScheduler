@@ -103,7 +103,7 @@ class TestSpeakCreateView(TestCase):
         self.assertEqual(Speak.objects.all().count(), records)
 
 
-class TestSpeakDeleteView(TestCase):
+class TestSpeakReadView(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(
             username='test_user1', 
@@ -111,68 +111,24 @@ class TestSpeakDeleteView(TestCase):
             password='test_password1',
         )
         self.client.force_login(self.user)
-
-    def create_speak(self, content: str):
         self.speak = Speak.objects.create(
-            content=content,
+            content='TestSpeakReadView',
             user=self.user
         )
-        return self.speak
-
-    def get(self, pk: int):
-        return self.client.get(reverse('speaks:speak_delete', args=[pk]))
     
-    def post(self, pk: int, post_data={}):
-        return self.client.post(reverse('speaks:speak_delete', args=[pk]), post_data)
+    def get(self, pk: int):
+        return self.client.get(reverse('speaks:speak_read', args=[pk]))
 
     def test_get_succeeds(self):
-        speak = self.create_speak(content='test_get_succeeds')
-
-        response = self.get(speak.id)
+        response = self.get(self.speak.id)
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'speaks/speak_delete.html')
+        self.assertTemplateUsed(response, 'speaks/speak_read.html')
     
-    def test_get_fails_by_logouted_user(self):
-        speak = self.create_speak(content='test_get_fails_by_logouted_user')
+    def test_get_succeeds_by_logouted_user(self):
         self.client.logout()
-        response = self.get(speak.id)
-        params = urlencode({'next':reverse('speaks:speak_delete', args=[speak.id])})
-        expected_url = f'{reverse(settings.LOGIN_URL)}?{params}'
-        self.assertRedirects(response, expected_url)
-
-    def test_post_succeeds(self):
-        speak = self.create_speak(content='test_post_succeeds')
-
-        response = self.post(speak.id)
-        self.assertRedirects(response, reverse('accounts:home'))
-
-        self.assertEqual(Speak.objects.filter(content='test_post_succeeds').count(), 0)
-
-    def test_post_fails_by_logouted_user(self):
-        speak = self.create_speak(content='test_post_fails_by_logouted_user')
-
-        self.client.logout()
-        response = self.post(speak.id)
-        params = urlencode({'next':reverse('speaks:speak_delete', args=[speak.id])})
-        expected_url = f'{reverse(settings.LOGIN_URL)}?{params}'
-        self.assertRedirects(response, expected_url)
-
-        self.assertEqual(Speak.objects.filter(content='test_post_fails_by_logouted_user').count(), 1)
-
-    def test_post_fails_by_unauthorized_user(self):
-        speak = self.create_speak(content='test_post_fails_by_unauthorized_user')
-        self.client.logout()
-        self.user = User.objects.create_user(
-            username='test_user2', 
-            email='test_email2@user.com',
-            password='test_password2',
-        )
-        self.client.force_login(self.user)
-
-        response = self.post(speak.id)
-        self.assertEqual(response.status_code, 404)
-
-        self.assertEqual(Speak.objects.filter(content='test_post_fails_by_unauthorized_user').count(), 1)
+        response = self.get(self.speak.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'speaks/speak_read.html')
 
 
 class TestSpeakUpdateView(TestCase):
@@ -264,6 +220,78 @@ class TestSpeakUpdateView(TestCase):
             speak.id,
             {'content': 'test_post_fails_by_unauthorized_user_updated'}
         )
+        self.assertEqual(response.status_code, 404)
+
+        self.assertEqual(Speak.objects.filter(content='test_post_fails_by_unauthorized_user').count(), 1)
+
+
+class TestSpeakDeleteView(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username='test_user1', 
+            email='test_email1@user.com',
+            password='test_password1',
+        )
+        self.client.force_login(self.user)
+
+    def create_speak(self, content: str):
+        self.speak = Speak.objects.create(
+            content=content,
+            user=self.user
+        )
+        return self.speak
+
+    def get(self, pk: int):
+        return self.client.get(reverse('speaks:speak_delete', args=[pk]))
+    
+    def post(self, pk: int, post_data={}):
+        return self.client.post(reverse('speaks:speak_delete', args=[pk]), post_data)
+
+    def test_get_succeeds(self):
+        speak = self.create_speak(content='test_get_succeeds')
+
+        response = self.get(speak.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'speaks/speak_delete.html')
+    
+    def test_get_fails_by_logouted_user(self):
+        speak = self.create_speak(content='test_get_fails_by_logouted_user')
+        self.client.logout()
+        response = self.get(speak.id)
+        params = urlencode({'next':reverse('speaks:speak_delete', args=[speak.id])})
+        expected_url = f'{reverse(settings.LOGIN_URL)}?{params}'
+        self.assertRedirects(response, expected_url)
+
+    def test_post_succeeds(self):
+        speak = self.create_speak(content='test_post_succeeds')
+
+        response = self.post(speak.id)
+        self.assertRedirects(response, reverse('accounts:home'))
+
+        self.assertEqual(Speak.objects.filter(content='test_post_succeeds').count(), 0)
+
+    def test_post_fails_by_logouted_user(self):
+        speak = self.create_speak(content='test_post_fails_by_logouted_user')
+
+        self.client.logout()
+        response = self.post(speak.id)
+        params = urlencode({'next':reverse('speaks:speak_delete', args=[speak.id])})
+        expected_url = f'{reverse(settings.LOGIN_URL)}?{params}'
+        self.assertRedirects(response, expected_url)
+
+        self.assertEqual(Speak.objects.filter(content='test_post_fails_by_logouted_user').count(), 1)
+
+    def test_post_fails_by_unauthorized_user(self):
+        speak = self.create_speak(content='test_post_fails_by_unauthorized_user')
+        self.client.logout()
+        self.user = User.objects.create_user(
+            username='test_user2', 
+            email='test_email2@user.com',
+            password='test_password2',
+        )
+        self.client.force_login(self.user)
+
+        response = self.post(speak.id)
         self.assertEqual(response.status_code, 404)
 
         self.assertEqual(Speak.objects.filter(content='test_post_fails_by_unauthorized_user').count(), 1)

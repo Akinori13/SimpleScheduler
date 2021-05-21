@@ -4,6 +4,8 @@
 {% block titele %}プロフィール{{ block.super }}{% endblock %}
 
 {% block content %}
+{% include "parts/global_navi.html" %}
+
 <div class="container">
     <div class="row">
         <div class="col-12">
@@ -36,6 +38,9 @@
         <div class="col-12">
             <hr>
         </div>
+    </div>
+    <div class="row">
+        {% include "parts/speak_list.html" with speaks=profile.user.speak_set.all %}
     </div>
 </div>
 {% endblock %}

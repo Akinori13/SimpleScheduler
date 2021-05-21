@@ -1,7 +1,7 @@
 {% extends "common/base.html" %}
 {% load widget_tweaks %}
 
-{% block titele %}Speak{{ block.super }}{% endblock %}
+{% block titele %}Speak Update{{ block.super }}{% endblock %}
 
 {% block content %}
 {% include "parts/global_navi.html" %}
@@ -9,7 +9,7 @@
 <div class="container d-flex justify-content-center">
     <div class="card w-100">
         <div class="card-body">
-            <h2 class="card-title">Speak</h2>
+            <h2 class="card-title">Speak Update</h2>
             <form method="post">
                 {% csrf_token %}
                 

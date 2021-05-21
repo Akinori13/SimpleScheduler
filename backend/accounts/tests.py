@@ -1,6 +1,3 @@
-import sys
-import time
-
 from django.test import TestCase
 from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm

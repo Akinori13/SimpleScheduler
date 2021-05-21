@@ -1,6 +1,7 @@
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic.detail import DetailView
 from django.views.generic.edit import DeleteView, UpdateView
 
 from .models import Speak
@@ -15,18 +16,23 @@ class SpeakCreateView(LoginRequiredMixin, CreateView):
         form.instance.user = self.request.user
         return super().form_valid(form)
 
-class SpeakDeleteView(LoginRequiredMixin, DeleteView):
+class SpeakReadView(DetailView):
     model = Speak
-    template_name = 'speaks/speak_delete.html'
-    success_url = reverse_lazy('accounts:home')
-
-    def get_queryset(self):
-        return self.model.objects.filter(user=self.request.user)
+    template_name = 'speaks/speak_read.html'
+    context_object_name = 'speak'
 
 class SpeakUpdateView(LoginRequiredMixin, UpdateView):
     model = Speak
     fields = ['content']
     template_name = 'speaks/speak_update.html'
+    success_url = reverse_lazy('accounts:home')
+
+    def get_queryset(self):
+        return self.model.objects.filter(user=self.request.user)
+
+class SpeakDeleteView(LoginRequiredMixin, DeleteView):
+    model = Speak
+    template_name = 'speaks/speak_delete.html'
     success_url = reverse_lazy('accounts:home')
 
     def get_queryset(self):

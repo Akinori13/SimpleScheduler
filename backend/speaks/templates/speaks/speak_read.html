@@ -16,12 +16,27 @@
             </div>
             <div class="content-wrapper w-100 px-2">
                 <div class="content-header d-flex justify-content-between align-items-center w-100">
-                    <a href="{% url 'accounts:profile_detail' speak.user.profile.id %}" class="text-body fw-bold text-decoration-none">{{ speak.user }}</a>
-                    <div>
-                        <i class="fas fa-ellipsis-h"></i>
+                    <a href="{% url 'accounts:profile_detail' speak.user.profile.id %}" class="text-body fw-bold text-decoration-none">{{ speak.user }} <span class="text-muted fw-lighter">{{ speak.user.uuid }}</span></a>
+                    <div class="dropdown">
+                        <div id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </div>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            {% if request.user == speak.user %}
+                            <li><a class="dropdown-item" href="{% url 'speaks:speak_update' speak.id %}">Update</a></li>
+                            <li><a class="dropdown-item" href="{% url 'speaks:speak_delete' speak.id %}">Delete</a></li>
+                            {% endif %}
+                        </ul>
                     </div>
                 </div>
-                <p>{{ speak.content|linebreaksbr }}</p>
+                <div class="content-text">
+                    <p>{{ speak.content|linebreaksbr }}</p>
+                </div>
+                <div class="content-time ">
+                    <hr class="my-1">
+                    <time class="text-muted">{{ speak.updated_at|date:'H:i Y/m/d' }}</time>
+                    <hr class="my-1">
+                </div>
                 <div class="content-footer">
                     <ul class="d-flex list-unstyled justify-content-between align-items-center w-100 m-0">
                         <li><i class="far fa-comments"></i></li>
@@ -30,13 +45,10 @@
                         <li><i class="fas fa-share-alt"></i></li>
                     </ul>
                 </div>
-                <div class="content-footer">
-                    <ul class="d-flex list-unstyled justify-content-between align-items-center w-100 m-0">
-                        <li><a href="{% url 'speaks:speak_delete' speak.id %}">Delete</a></li>
-                        <li><a href="{% url 'speaks:speak_update' speak.id %}">Update</a></li>
-                    </ul>
-                </div>
             </div>
+        </div>
+        <div class="col-12">
+            <hr>
         </div>
     </div>
 </div>

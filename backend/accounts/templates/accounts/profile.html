@@ -39,5 +39,8 @@
             <hr>
         </div>
     </div>
+    <div class="row">
+        {% include "parts/speak_list.html" with speaks=profile.user.speak_set.all %}
+    </div>
 </div>
 {% endblock %}

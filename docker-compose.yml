@@ -20,6 +20,8 @@ services:
       - ./logs/django:/var/log/django
     ports:
       - "8000:8000"
+    env_file:
+      - ./infra/python/.env
     depends_on:
       - db
     networks:
@@ -33,6 +35,8 @@ services:
       - 'POSTGRES_DB=postgres'
       - 'POSTGRES_USER=postgres'
       - 'POSTGRES_PASSWORD=postgres'
+    ports:
+      - 5433:5432
     networks:
       - back
 volumes:

@@ -9,29 +9,31 @@
 ## Functions
 - [x] Signup Function
 - [x] Profile Function
-- [x] Speak Function (Like Twetter)
-- [ ] Finish Account Changing Function
-- [ ] Two Steps Auth Function (Token Authentication)
-- [ ] Social Auth Function
+- [x] Speak Function (Like Twitter)
+- [x] Password Change and Reset Function
+- [ ] Sign up with one time token Function
+- [ ] Social Auth Function (GitHub)
 - [ ] Todo Function
-- [ ] Mail to deliver todo lists Function
+- [ ] Mail ToDo lists Function
 - [ ] Like Function
 - [ ] Reply Function
 - [ ] Respeak Function
-- [ ] Add Todos by CSV Function
-- [ ] Alert Function
+- [ ] Add Todos with CSV Function
+- [ ] Pomodoro Function
+- [ ] Support Function
+- [ ] Billing to support Function (stripe)
+- [ ] Search Function (Elasticsearch)
 - [ ] Direct Messages Function
 - [ ] Video Chat Function
 - [ ] Follow Function
-- [ ] Search Function (Elasticsearch)
 - [ ] Group Function
+- [ ] Matching(Recommend) Function
+- [ ] Virtual Office Function
+- [ ] Kanban Function
 - [ ] HashTags Function
 - [ ] Ranking Function
-- [ ] Support Function
-- [ ] Billing to support Function (stripe)
-- [ ] Private Account Function
+- [ ] Make accounts private Function
 - [ ] Share Function
 - [ ] SEO(OGP/Favicon) Function
-- [ ] Qualifications Function
-- [ ] Matching(Recommend) Function
 - [ ] Embeded Function (iframe)
+- [ ] Qualifications Function

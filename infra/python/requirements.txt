@@ -4,3 +4,6 @@ Pillow~=8.2
 psycopg2-binary~=2.8
 psycopg2~=2.8
 django-widget-tweaks~=1.4
+django-environ==0.4.5
+whitenoise
+django-debug-toolbar

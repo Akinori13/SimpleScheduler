@@ -38,8 +38,11 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
-    uuid = models.UUIDField(default=uuid_lib.uuid4,
-                            primary_key=True, editable=False)
+    uuid = models.UUIDField(
+        default=uuid_lib.uuid4,
+        primary_key=True, 
+        editable=False
+    )
     username_validator = UnicodeUsernameValidator()
 
     username = models.CharField(
@@ -94,9 +97,24 @@ class User(AbstractBaseUser, PermissionsMixin):
     def get_short_name(self):
         return self.username
 
+
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    text = models.TextField(max_length=140, blank=True, null=True, default='')
-    icon_image = models.ImageField(default='profile/default_icon.jpg', upload_to='profile/icon_pics')
-    header_image = models.ImageField(default='profile/default_header.jpg', upload_to='profile/header_pics')
-    updated_at = models.DateTimeField(auto_now=True)
+    user = models.OneToOneField(
+        User, 
+        on_delete=models.CASCADE
+    )
+    text = models.TextField(
+        max_length=140, 
+        blank=True, 
+        null=True, 
+        default=''
+    )
+    icon_image = models.ImageField(
+        default='profile/default_icon.jpg', upload_to='profile/icon_pics'
+    )
+    header_image = models.ImageField(
+        default='profile/default_header.jpg', upload_to='profile/header_pics'
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )

@@ -3,7 +3,7 @@
     {% blocktranslate %}You're receiving this email because you registered {{ site_name }}.{% endblocktranslate %}
 
     {% translate "Please go to the following page and register completely:" %}
-    {% block reset_link %}
+    {% block signup_link %}
         {{ protocol }}://{{ domain }}{% url 'accounts:signup_complete' token %}
     {% endblock %}
     {% translate 'Your username, in case you’ve forgotten:' %} {{ user.get_username }}

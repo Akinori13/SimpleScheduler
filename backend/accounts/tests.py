@@ -1,98 +1,81 @@
 from django.test import TestCase
 from django.conf import settings
+from django.core import mail
 from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse
 
 from .models import User, Profile
 from .forms import CustomUserCreationForm
 
+import re
+
 
 # Create your tests here.
-class TestUserCreate(TestCase):
+class TestSignup(TestCase):
     def setUp(self):
         pass    
 
-    def get(self, params={}):
-        return self.client.get(reverse('accounts:signup'), params)
+    def get(self, url=reverse('accounts:signup'), params={}):
+        return self.client.get(url, params)
 
     def post(self, post_data={}):
         return self.client.post(reverse('accounts:signup'), post_data)
 
-    def test_get(self):
+    def test_get_succeeds(self):
         response = self.get()
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'accounts/signup.html')
+        self.assertTemplateUsed(response, 'registration/signup.html')
         self.assertTrue(isinstance(response.context['form'], CustomUserCreationForm))
     
-    def test_post(self):
+    def test_post_succeeds(self):
         response = self.post({
-            'username': 'testuser',
+            'username': 'test_post_succeeds',
             'email': 'test@user.com',
             'password1': 'test_password',
             'password2': 'test_password',
         })
+        self.assertRedirects(response, reverse('accounts:signup_done'))
+        url=re.search(r'https?://[\w/:%#\$&\?\(\)~\.=\+\-]+', mail.outbox[0].body).group()
+        response = self.get(url=url)
+        self.assertTemplateUsed(response, 'registration/signup_complete.html')
+        self.assertEqual(User.objects.filter(username='test_post_succeeds').count(), 1)
+        
 
-        self.assertRedirects(response, reverse('accounts:home'))
-
-        users = User.objects.filter(username='testuser',)
-        self.assertEqual(users.count(), 1)
-
-    def test_post_with_password_mismatch(self):
+    def test_post_fails_with_password_mismatch(self):
         response = self.post({
-            'username': 'testuser',
+            'username': 'test_post_fails_with_password_mismatch',
             'email': 'test@user.com',
             'password1': 'test_password1',
             'password2': 'test_password2',
         })
-
-        # Check that the page remains
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'accounts/signup.html')
-
-        # Check that the form has a error
+        self.assertTemplateUsed(response, 'registration/signup.html')
         self.assertTrue(response.context['form'].errors['password2'])
-
-        # Checkou that the user wasn't created
-        users = User.objects.filter(username='testuser',)
-        self.assertEqual(users.count(), 0)
+        self.assertEqual(User.objects.filter(username='test_post_fails_with_password_mismatch').count(), 0)
     
-    def test_post_with_too_short_password(self):
+    def test_post_fails_with_too_short_password(self):
         response = self.post({
-            'username': 'testuser',
+            'username': 'test_post_fails_with_too_short_password',
             'email': 'test@user.com',
             'password1': 'test',
             'password2': 'test',
         })
-
-        # Check that the page remains
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'accounts/signup.html')
-
-        # Check that the form has a error
+        self.assertTemplateUsed(response, 'registration/signup.html')
         self.assertContains(response, 'このパスワードは短すぎます。')
+        self.assertEqual(User.objects.filter(username='test_post_fails_with_too_short_password').count(), 0)
 
-        # Checkou that the user wasn't created
-        users = User.objects.filter(username='testuser',)
-        self.assertEqual(users.count(), 0)
-
-    def test_post_with_missing_password(self):
+    def test_post_fails_with_missing_password(self):
         response = self.post({
-            'username': 'testuser',
+            'username': 'test_post_fails_with_missing_password',
             'email': 'test@user.com',
             'password1': '',
             'password2': '',
         })
-
-        # Check that the page remains
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'accounts/signup.html')
-
-        # Check that the form has a error
+        self.assertTemplateUsed(response, 'registration/signup.html')
         self.assertTrue(response.context['form'].errors['password1'])
-
-        # Checkou that the user wasn't created
-        users = User.objects.filter(username='testuser',)
-        self.assertEqual(users.count(), 0)
+        self.assertEqual(User.objects.filter(username='test_post_fails_with_missing_password').count(), 0)
 
 
 class TestLogin(TestCase):

@@ -1,9 +1,9 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from ..models import User, Profile
+from accounts.models import User, Profile
 
 @receiver(post_save, sender=User)
-def create_profile_with_user(sender, instance, created, **kwargs):
-    if created:
-        profile = Profile.objects.get_or_create(user=instance)
+def create_profile_with_signup(sender, instance, update_fields, **kwargs):
+    if instance.is_active == True:
+        Profile.objects.get_or_create(user=instance)

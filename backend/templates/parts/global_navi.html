@@ -15,6 +15,10 @@
                 {% url 'speaks:speak_create' as url_speaks_speak_create %}
                 {% menu_link url_speaks_speak_create request.get_full_path "Speak" %}
             </li>
+            <li class="px-2">
+                {% url 'accounts:settings' as url_accounts_settings %}
+                {% menu_link url_accounts_settings request.get_full_path "Settings" %}
+            </li>
         </ul>
     </div>
 </div>

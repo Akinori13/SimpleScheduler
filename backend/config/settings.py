@@ -153,6 +153,7 @@ AUTH_USER_MODEL = 'accounts.User'
 LOGIN_REDIRECT_URL = 'accounts:home'
 LOGIN_URL = 'accounts:login'
 LOGOUT_REDIRECT_URL = 'accounts:login'
+ACTIVATION_TIMEOUT_SECONDS = 60*60*24
 
 
 # Mail Settings

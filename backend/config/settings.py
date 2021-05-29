@@ -25,6 +25,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+DEBUG_TOOLBAR = False
 
 ALLOWED_HOSTS = []
 
@@ -41,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'widget_tweaks',
-    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
@@ -53,8 +53,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+if DEBUG_TOOLBAR:
+    INSTALLED_APPS += ['debug_toolbar']
+    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
+
 
 ROOT_URLCONF = 'config.urls'
 
@@ -153,6 +157,7 @@ AUTH_USER_MODEL = 'accounts.User'
 LOGIN_REDIRECT_URL = 'accounts:home'
 LOGIN_URL = 'accounts:login'
 LOGOUT_REDIRECT_URL = 'accounts:login'
+ACTIVATION_TIMEOUT_SECONDS = 60*60*24
 
 
 # Mail Settings
@@ -164,16 +169,6 @@ EMAIL_FILE_PATH = '/var/log/django/app-messages'
 # Django Debug Toolbar
 
 INTERNAL_IPS = ['127.0.0.1']
-
-
-def custom_show_toolbar(request):
-    return True
-
 DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': custom_show_toolbar,
+    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
 }
-
-if DEBUG:
-    import mimetypes
-    mimetypes.add_type("text/javascript", ".js", True)
-    mimetypes.add_type("text/css", ".css", True)

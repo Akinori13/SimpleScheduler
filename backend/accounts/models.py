@@ -38,25 +38,25 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 class User(AbstractBaseUser, PermissionsMixin):
-    uuid = models.UUIDField(
+    id = models.UUIDField(
         default=uuid_lib.uuid4,
         primary_key=True, 
         editable=False
     )
-    username_validator = UnicodeUsernameValidator()
-
     username = models.CharField(
         _('username'),
         max_length=150,
         unique=True,
         help_text=_(
             'Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
-        validators=[username_validator],
+        validators=[UnicodeUsernameValidator()],
         error_messages={
             'unique': _("A user with that username already exists."),
         },
     )
-    email = models.EmailField(_('email address'), blank=True, null=True)
+    email = models.EmailField(
+        _('email address'),
+    )
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
@@ -71,7 +71,10 @@ class User(AbstractBaseUser, PermissionsMixin):
             'Unselect this instead of deleting accounts.'
         ),
     )
-    date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
+    date_joined = models.DateTimeField(
+        _('date joined'), 
+        default=timezone.now
+    )
 
     objects = UserManager()
 

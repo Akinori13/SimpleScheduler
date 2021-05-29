@@ -11,6 +11,7 @@ services:
       - app
     networks:
       - front
+    restart: always
   app:
     build: ./infra/python
     working_dir: /code/backend
@@ -27,6 +28,7 @@ services:
     networks:
       - front
       - back
+    restart: always
   db:
     image: postgres
     volumes:
@@ -39,6 +41,7 @@ services:
       - 5433:5432
     networks:
       - back
+    restart: always
 volumes:
   postgres_data:    
 

@@ -9,18 +9,35 @@ services:
       - "80:80"
     depends_on:
       - app
+      - channels
     networks:
       - front
+    restart: always
+  channels:
+    build: ./infra/channels
+    working_dir: /code/backend
+    command: daphne config.asgi:application -p 9000
+    volumes:
+      - ./backend:/code/backend
+    expose: 
+      - "9000"
+    env_file:
+      - ./infra/python/.env
+    depends_on:
+      - db
+    networks:
+      - front
+      - back
     restart: always
   app:
     build: ./infra/python
     working_dir: /code/backend
-    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn config.wsgi:application -p 8080
     volumes:
       - ./backend:/code/backend
       - ./logs/django:/var/log/django
-    ports:
-      - "8000:8000"
+    expose:
+      - "8080"
     env_file:
       - ./infra/python/.env
     depends_on:

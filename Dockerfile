@@ -14,5 +14,6 @@ RUN pip install -r requirements.txt
 
 ADD . /code/
 
+RUN chmod 755 /
 RUN chmod 755 run.sh
 ENTRYPOINT ["/code/run.sh"]

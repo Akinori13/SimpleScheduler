@@ -12,20 +12,16 @@
             <button type="button" onclick="connect();" class="btn btn-primary">Connect</button>
             <button type="button" onclick="hangUp();" class="btn btn-primary">Hang Up</button>
             <div>
-                <video id="local_video" autoplay style="width: 160px; height: 120px; border: 1px solid black;"></video>
-                <video id="remote_video" autoplay style="width: 160px; height: 120px; border: 1px solid black;"></video>
+                <video id="local_video" autoplay muted=true playsInline=true style="width: 160px; height: 120px; border: 1px solid black;"></video>
+                <video id="remote_video" autoplay muted=true playsInline=true style="width: 160px; height: 120px; border: 1px solid black;"></video>
             </div>
             <p>SDP to send:<br />
-                <textarea id="text_for_send_sdp" rows="5" cols="60" readonly="readonly">SDP to send</textarea>
+                <textarea id="text_for_send_sdp" rows="5" cols="60" readonly="readonly" class="form-control"></textarea>
             </p>
             <p>SDP to receive:
-                <button type="button" onclick="onSdpText();" class="btn btn-primary">Receive remote SDP</button><br />
-                <textarea id="text_for_receive_sdp" rows="5" cols="60"></textarea>
+                <textarea id="text_for_receive_sdp" rows="5" cols="60" readonly="readonly" class="form-control"></textarea>
             </p>
 
-            <textarea id="chat-log" cols="100" rows="20" class="form-control"></textarea><br>
-            <input id="chat-message-input" type="text" size="100" class="form-control"><br>
-            <input id="chat-message-submit" type="button" value="Send" class="btn btn-primary">
             {{ room_name|json_script:"room-name" }}
             {{ uuid|json_script:"uuid" }}
             <script>
@@ -38,7 +34,7 @@
                 let negotiationneededCounter = 0;
                 let isOffer = false;
 
-                // シグナリングサーバへ接続する
+                
                 const roomName = JSON.parse(document.getElementById('room-name').textContent);
                 const uuid = JSON.parse(document.getElementById('uuid').textContent);
 
@@ -62,12 +58,18 @@
                     switch(message.type){
                         case 'offer': {
                             console.log('Received offer ...');
+                            if (textForSendSdp.value){
+                                return;
+                            }
                             textToReceiveSdp.value = message.sdp;
                             setOffer(message);
                             break;
                         }
                         case 'answer': {
                             console.log('Received answer ...');
+                            if (textToReceiveSdp.value){
+                                return;
+                            }
                             textToReceiveSdp.value = message.sdp;
                             setAnswer(message);
                             break;
@@ -77,6 +79,11 @@
                             const candidate = new RTCIceCandidate(message.ice);
                             console.log(candidate);
                             addIceCandidate(candidate);
+                            break;
+                        }
+                        case 'close': {
+                            console.log('peer is closed ...');
+                            hangUp();
                             break;
                         }
                         default: { 
@@ -120,7 +127,7 @@
                     try {
                         console.log(stream)
                         await element.play();
-                    } catch(erro) {
+                    } catch(error) {
                         console.log('error auto play:' + error);
                     }
                 }
@@ -140,9 +147,9 @@
                     peer.onicecandidate = evt => {
                         if (evt.candidate) {
                             console.log(evt.candidate);
+                            sendIceCandidate(evt.candidate);
                         } else {
                             console.log('empty ice event');
-                            sendSdp(peer.localDescription);
                         }
                     };
 
@@ -194,8 +201,9 @@
                 function sendSdp(sessionDescription) {
                     console.log('---sending sdp ---');
                     textForSendSdp.value = sessionDescription.sdp;
-                    textForSendSdp.focus();
-                    textForSendSdp.select();
+                    const message = JSON.stringify(sessionDescription);
+                    console.log('sending SDP=' + message);
+                    ws.send(message);
                 }
 
                 // Connectボタンが押されたらWebRTCのOffer処理を開始
@@ -227,27 +235,6 @@
                     }
                 }
 
-                // Receive remote SDPボタンが押されたらOffer側とAnswer側で処理を分岐
-                function onSdpText() {
-                    const text = textToReceiveSdp.value;
-                    if (peerConnection) {
-                        console.log('Received answer text...');
-                        const answer = new RTCSessionDescription({
-                            type : 'answer',
-                            sdp : text,
-                        });
-                        setAnswer(answer);
-                    }
-                    else {
-                        console.log('Received offer text...');
-                        const offer = new RTCSessionDescription({
-                            type : 'offer',
-                            sdp : text,
-                        });
-                        setOffer(offer);
-                    }
-                    textToReceiveSdp.value ='';
-                }
 
                 // Offer側のSDPをセットする処理
                 async function setOffer(sessionDescription) {
@@ -285,8 +272,12 @@
                             peerConnection.close();
                             peerConnection = null;
                             negotiationneededCounter = 0;
+                            const message = JSON.stringify({ type: 'close' });
+                            console.log('sending close message');
+                            ws.send(message);
                             cleanupVideoElement(remoteVideo);
                             textForSendSdp.value = '';
+                            textToReceiveSdp.value = '';
                             return;
                         }
                     }

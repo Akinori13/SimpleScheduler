@@ -16,23 +16,15 @@
     <div class="row">
         <div class="col-12">
             <div>
-                <video id="local_video" autoplay muted=true playsInline=true style="width: 160px; height: 120px; border: 1px solid black;"></video>
-                <video id="remote_video" autoplay muted=true playsInline=true style="width: 160px; height: 120px; border: 1px solid black;"></video>
+                <video id="local_video" autoplay muted=true playsInline=true style="width: 160px; height: 120px;" class="rounded"></video>
+                <video id="remote_video" autoplay muted=true playsInline=true style="width: 160px; height: 120px;" class="rounded"></video>
             </div>
-            <p>SDP to send:<br />
-                <textarea id="text_for_send_sdp" rows="5" cols="60" readonly="readonly" class="form-control"></textarea>
-            </p>
-            <p>SDP to receive:
-                <textarea id="text_for_receive_sdp" rows="5" cols="60" readonly="readonly" class="form-control"></textarea>
-            </p>
 
             {{ room_name|json_script:"room-name" }}
             {{ uuid|json_script:"uuid" }}
             <script>
                 const localVideo = document.getElementById('local_video');
                 const remoteVideo = document.getElementById('remote_video');
-                const textForSendSdp = document.getElementById('text_for_send_sdp');
-                const textToReceiveSdp = document.getElementById('text_for_receive_sdp');
                 let localStream = null;
                 let peerConnection = null;
                 let negotiationneededCounter = 0;
@@ -65,13 +57,11 @@
                     switch(message.type){
                         case 'offer': {
                             console.log('Received offer ...');
-                            textToReceiveSdp.value = message.sdp;
                             setOffer(message);
                             break;
                         }
                         case 'answer': {
                             console.log('Received answer ...');
-                            textToReceiveSdp.value = message.sdp;
                             setAnswer(message);
                             break;
                         }
@@ -201,7 +191,6 @@
                 // 手動シグナリングのための処理を追加する
                 function sendSdp(sessionDescription) {
                     console.log('---sending sdp ---');
-                    textForSendSdp.value = sessionDescription.sdp;
                     const message = JSON.stringify({ type: sessionDescription.type, sdp: sessionDescription.sdp, uuid: uuid });
                     console.log('sending SDP=' + message);
                     ws.send(message);
@@ -277,8 +266,6 @@
                             console.log('sending close message');
                             ws.send(message);
                             cleanupVideoElement(remoteVideo);
-                            textForSendSdp.value = '';
-                            textToReceiveSdp.value = '';
                             return;
                         }
                     }

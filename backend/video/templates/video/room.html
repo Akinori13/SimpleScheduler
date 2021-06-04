@@ -6,11 +6,15 @@
 {% block content %}
 {% include "parts/global_navi.html" %}
 <div class="container">
-    <div class="row">
-        <div class="col-12">
+    <div class="row my-2">
+        <div class="col-12 d-flex gap-2">
             <button type="button" onclick="startVideo();" class="btn btn-primary">Start Video</button>
             <button type="button" onclick="connect();" class="btn btn-primary">Connect</button>
-            <button type="button" onclick="hangUp();" class="btn btn-primary">Hang Up</button>
+            <button type="button" onclick="hangUp();" class="btn btn-danger">Hang Up</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
             <div>
                 <video id="local_video" autoplay muted=true playsInline=true style="width: 160px; height: 120px; border: 1px solid black;"></video>
                 <video id="remote_video" autoplay muted=true playsInline=true style="width: 160px; height: 120px; border: 1px solid black;"></video>
@@ -55,21 +59,18 @@
                 ws.onmessage = (evt) => {
                     console.log('ws onmessage() data:', evt.data);
                     const message = JSON.parse(evt.data);
+                    if (message.uuid === uuid){
+                        return;
+                    }
                     switch(message.type){
                         case 'offer': {
                             console.log('Received offer ...');
-                            if (textForSendSdp.value){
-                                return;
-                            }
                             textToReceiveSdp.value = message.sdp;
                             setOffer(message);
                             break;
                         }
                         case 'answer': {
                             console.log('Received answer ...');
-                            if (textToReceiveSdp.value){
-                                return;
-                            }
                             textToReceiveSdp.value = message.sdp;
                             setAnswer(message);
                             break;
@@ -107,7 +108,7 @@
                 // ICE candidate生成時に送信する
                 function sendIceCandidate(candidate) {
                     console.log('---sending ICE candidate ---');
-                    const message = JSON.stringify({ type: 'candidate', ice: candidate });
+                    const message = JSON.stringify({ type: 'candidate', ice: candidate, uuid: uuid });
                     console.log('sending candidate=' + message);
                     ws.send(message);
                 }
@@ -201,7 +202,7 @@
                 function sendSdp(sessionDescription) {
                     console.log('---sending sdp ---');
                     textForSendSdp.value = sessionDescription.sdp;
-                    const message = JSON.stringify(sessionDescription);
+                    const message = JSON.stringify({ type: sessionDescription.type, sdp: sessionDescription.sdp, uuid: uuid });
                     console.log('sending SDP=' + message);
                     ws.send(message);
                 }

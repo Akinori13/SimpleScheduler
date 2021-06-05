@@ -84,52 +84,58 @@
         };
         ws.onmessage = (evt) => {
             const message = JSON.parse(evt.data);
-            if (message.uuid === uuid){
+            if (message.from_uuid === uuid){
+                console.log('sended by me');
                 return;
             }
-            console.log('ws onmessage() data:', evt.data);
-            switch(message.type){
-                case 'offer': {
-                    console.log('Received offer ...');
-                    setOffer(message, message.uuid);
-                    break;
+            if (message.to_uuid === uuid || message.to_uuid === 'every'){
+                console.error(`from: ${message.from_uuid} to: ${message.to_uuid}`)
+                console.log('ws onmessage() data:', evt.data);
+                switch(message.type){
+                    case 'offer': {
+                        console.log('Received offer ...');
+                        setOffer(message, message.from_uuid);
+                        break;
+                    }
+                    case 'answer': {
+                        console.log('Received answer ...');
+                        setAnswer(message, message.from_uuid);
+                        break;
+                    }
+                    case 'candidate': {
+                        console.log('Received ICE candidate ...');
+                        const candidate = new RTCIceCandidate(message.ice);
+                        console.log(candidate);
+                        addIceCandidate(candidate, message.from_uuid);
+                        break;
+                    }
+                    case 'close': {
+                        console.log('peer is closed ...');
+                        hangUp();
+                        break;
+                    }
+                    case 'callOffer': {
+                        console.log('Received callOffer ...');
+                        connect(message.from_uuid)
+                        break;
+                    }
+                    default: { 
+                        console.log("Invalid message"); 
+                        break;              
+                        }         
                 }
-                case 'answer': {
-                    console.log('Received answer ...');
-                    setAnswer(message, message.uuid);
-                    break;
-                }
-                case 'candidate': {
-                    console.log('Received ICE candidate ...');
-                    const candidate = new RTCIceCandidate(message.ice);
-                    console.log(candidate);
-                    addIceCandidate(candidate, message.uuid);
-                    break;
-                }
-                case 'close': {
-                    console.log('peer is closed ...');
-                    hangUp();
-                    break;
-                }
-                case 'callOffer': {
-                    console.log('Received callOffer ...');
-                    connect(message.uuid)
-                    break;
-                }
-                default: { 
-                    console.log("Invalid message"); 
-                    break;              
-                    }         
+            } else {
+                return;
             }
         };
 
         // ICE candaidate受信時にセットする
-        function addIceCandidate(candidate, uuid) {
-            if (! isConnectedWith(uuid)) {
-                console.warn('NOT CONNEDTED or ALREADY CLOSED with id=' + uuid + ', so ignore candidate');
+        function addIceCandidate(candidate, from_uuid) {
+            if (! isConnectedWith(from_uuid)) {
+                console.warn('NOT CONNEDTED or ALREADY CLOSED with id=' + from_uuid + ', so ignore candidate');
                 return;
             }
-            let peerConnection = getConnection(uuid);
+            let peerConnection = getConnection(from_uuid);
             if (peerConnection){
                 peerConnection.addIceCandidate(candidate);
             } else {
@@ -139,22 +145,22 @@
         }
 
         // ICE candidate生成時に送信する
-        function sendIceCandidate(candidate) {
+        function sendIceCandidate(candidate, to_uuid) {
             console.log('---sending ICE candidate ---');
-            const message = JSON.stringify({ type: 'candidate', ice: candidate, uuid: uuid });
+            const message = JSON.stringify({ type: 'candidate', ice: candidate, from_uuid: uuid, to_uuid: to_uuid });
             console.log('sending candidate=' + message);
             ws.send(message);
         }
 
         // WebRTCを利用する準備をする
-        function prepareNewConnection(isOffer, uuid) {
+        function prepareNewConnection(isOffer, from_uuid) {
             const pc_config = {"iceServers":[ {"urls":"stun:stun.1.google.com:19302"} ]};
             const peer = new RTCPeerConnection(pc_config);
 
             // リモートのMediStreamTrackを受信した時
             peer.ontrack = evt => {
                 console.log('-- peer.ontrack()');
-                let remoteVideo = addRemoteVideoElement(uuid);
+                let remoteVideo = addRemoteVideoElement(from_uuid);
                 playVideo(remoteVideo, evt.streams[0]);
             };
 
@@ -162,7 +168,7 @@
             peer.onicecandidate = evt => {
                 if (evt.candidate) {
                     console.log(evt.candidate);
-                    sendIceCandidate(evt.candidate);
+                    sendIceCandidate(evt.candidate, from_uuid);
                 } else {
                     console.log('empty ice event');
                 }
@@ -176,7 +182,7 @@
                         console.log('createOffer() succsess in promise');
                         await peer.setLocalDescription(offer);
                         console.log('setLocalDescription() succsess in promise');
-                        sendSdp(peer.localDescription);
+                        sendSdp(peer.localDescription, from_uuid);
                     }
                 } catch(err){
                     console.error('setLocalDescription(offer) ERROR: ', err);
@@ -210,46 +216,45 @@
         }
 
         // Send SDP
-        function sendSdp(sessionDescription) {
+        function sendSdp(sessionDescription, to_uuid) {
             console.log('---sending sdp ---');
-            const message = JSON.stringify({ type: sessionDescription.type, sdp: sessionDescription.sdp, uuid: uuid });
+            const message = JSON.stringify({ type: sessionDescription.type, sdp: sessionDescription.sdp, from_uuid: uuid, to_uuid: to_uuid });
             console.log('sending SDP=' + message);
             ws.send(message);
         }
 
         // Handle Call Offer
-        function connect(uuid) {
-            if (isConnectedWith(uuid)) {
+        function connect(from_uuid) {
+            if (isConnectedWith(from_uuid)) {
                 console.warn('peer already exist.');
             } else {
                 console.log('make Offer');
-                peerConnection = prepareNewConnection(true, uuid);
-                addConnection(uuid, peerConnection);
+                peerConnection = prepareNewConnection(true, from_uuid);
+                addConnection(from_uuid, peerConnection);
             }
         }
 
         // Send Call Offer
         function callOffer(){
-            const message = JSON.stringify({ type: 'callOffer', from_uuid: uuid });
+            const message = JSON.stringify({ type: 'callOffer', from_uuid: uuid, to_uuid: 'every' });
             console.log('sending callOffer=' + message);
             ws.send(message);
         }
 
 
         // Generate Answer SDP
-        async function makeAnswer(uuid) {
+        async function makeAnswer(from_uuid) {
             console.log('sending Answer. Creating remote session description...' );
-            let peerConnection = getConnection(uuid);
+            let peerConnection = getConnection(from_uuid);
             if (! peerConnection) {
                 console.error('peerConnection NOT exist!');
-                return;
             }
             try{
                 let answer = await peerConnection.createAnswer();
                 console.log('createAnswer() succsess in promise');
                 await peerConnection.setLocalDescription(answer);
                 console.log('setLocalDescription() succsess in promise');
-                sendSdp(peerConnection.localDescription);
+                sendSdp(peerConnection.localDescription, from_uuid);
             } catch(err){
                 console.error(err);
             }
@@ -257,20 +262,19 @@
 
 
         // Set Offer SDP
-        async function setOffer(sessionDescription, uuid) {
-            if (isConnectedWith(uuid)){
+        async function setOffer(sessionDescription, from_uuid) {
+            console.log('async')
+            if (isConnectedWith(from_uuid)){
                 console.error('connected offer');
-                return;
             }
-            let peerConnection = prepareNewConnection(false, uuid);
-            addConnection(uuid, peerConnection);
+            let peerConnection = prepareNewConnection(false, from_uuid);
+            addConnection(from_uuid, peerConnection);
             try{
                 await peerConnection.setRemoteDescription(sessionDescription);
                 console.log('setRemoteDescription(answer) succsess in promise');
-                makeAnswer(uuid);
+                makeAnswer(from_uuid);
             } catch(err){
                 console.error('setRemoteDescription(offer) ERROR: ', err);
-                return;
             }
         }
 
@@ -355,5 +359,6 @@
             element.srcObject = null;
         }
 
+        startVideo();
     </script>
 {% endblock %}

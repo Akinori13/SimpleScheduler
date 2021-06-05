@@ -39,7 +39,6 @@
         let negotiationneededCounter = 0;
         let isOffer = false;
         let peerConnections = [];
-        let uuids = [];
 
         function getConnectionCount() {
             return peerConnections;
@@ -86,9 +85,6 @@
         ws.onmessage = (evt) => {
             const message = JSON.parse(evt.data);
             if (message.uuid === uuid){
-                return;
-            }
-            if (uuids[message.uuid] === 'complete'){
                 return;
             }
             console.log('ws onmessage() data:', evt.data);
@@ -159,10 +155,6 @@
             peer.ontrack = evt => {
                 console.log('-- peer.ontrack()');
                 let remoteVideo = addRemoteVideoElement(uuid);
-                if (uuids[uuid] = 'answer'){
-                    uuids[uuid] = 'complete';
-                }
-                console.error(uuids)
                 playVideo(remoteVideo, evt.streams[0]);
             };
 
@@ -233,13 +225,12 @@
                 console.log('make Offer');
                 peerConnection = prepareNewConnection(true, uuid);
                 addConnection(uuid, peerConnection);
-                uuids[uuid] = 'offer';
             }
         }
 
         // Send Call Offer
         function callOffer(){
-            const message = JSON.stringify({ type: 'callOffer', uuid: uuid });
+            const message = JSON.stringify({ type: 'callOffer', from_uuid: uuid });
             console.log('sending callOffer=' + message);
             ws.send(message);
         }
@@ -285,10 +276,6 @@
 
         // Set Answer SDP
         async function setAnswer(sessionDescription, uuid) {
-            if (uuids[uuid] === 'complete'){
-                console.error('connected Answer');
-                return;
-            }
             let peerConnection = getConnection(uuid);
             if (! peerConnection) {
                 console.error('peerConnection NOT exist!');
@@ -296,7 +283,6 @@
             }
             try{
                 await peerConnection.setRemoteDescription(sessionDescription);
-                uuids[uuid] = 'answer';
                 console.log('setRemoteDescription(answer) succsess in promise');
             } catch(err){
                 console.error('setRemoteDescription(answer) ERROR: ', err);

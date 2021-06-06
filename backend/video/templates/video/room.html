@@ -12,7 +12,7 @@
                 <div class="mb-2">
                     <div class="input-group">
                         <span class="input-group-text">Username</span>
-                        <input type="text" class="form-control" value={{request.user}}>
+                        <input type="text" class="form-control" value={{request.user}} id="local_username">
                     </div>
                 </div>
                 <div class="mb-2">
@@ -30,9 +30,10 @@
     </div>
     <div class="row my-2">
         <div class="col-12">
-            <div id="local_video_container">
+            <figure>
+                <figcaption id="local_username_display"></figcaption>
                 <video id="local_video" autoplay muted=true playsInline=true style="width: 320px; height: 240px;" class="rounded"></video>
-            </div>
+            </figure>
         </div>
     </div>
     <div class="row my-2">
@@ -43,41 +44,15 @@
     {{ room_name|json_script:"room-name" }}
     {{ uuid|json_script:"uuid" }}
     <script>
-        const localVideo = document.getElementById('local_video');
-        let remoteVideos = [];
-        const remoteVideosContainer = document.getElementById('remote_videos_container');
-        let localStream = null;
-        let negotiationneededCounter = 0;
-        let isOffer = false;
-        let peerConnections = [];
-
-        function getConnectionCount() {
-            return peerConnections;
-        }
-
-        function isConnectedWith(id) {
-            if (peerConnections[id]) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        function addConnection(id, peer) {
-            peerConnections[id] = peer;
-        }
-
-        function getConnection(id) {
-            return peerConnections[id];
-        }
-
-        function deleteConnection(id) {
-            delete peerConnections[id];
-        }
-
-        
         const roomName = JSON.parse(document.getElementById('room-name').textContent);
         const uuid = JSON.parse(document.getElementById('uuid').textContent);
+        const localVideo = document.getElementById('local_video');
+        const remoteVideosContainer = document.getElementById('remote_videos_container');
+        let localStream = null;
+        let remoteVideos = [];
+        let isOffer = false;
+        let peerConnections = [];
+        let usernames = [];
 
         const ws = new WebSocket(
             'ws://'
@@ -319,7 +294,6 @@
             tracks.forEach(function(track) {
                 track.stop();
             });
-
             localStream = null;
             localVideo.srcObject = null;
             return;
@@ -363,6 +337,8 @@
             try{
                 localStream = await navigator.mediaDevices.getUserMedia({video: true, audio: false});
                 playVideo(localVideo,localStream);
+                const local_username_display = document.getElementById('local_username_display');
+                local_username_display.innerText = `You`;
             } catch(err){
                 console.error('mediaDevice.getUserMedia() error:', err);
             }
@@ -391,5 +367,31 @@
             delete remoteVideos[uuid];
             return video;
         }
+
+        // ------------------ Handler for Peer Connections -----------------
+        function getConnectionCount() {
+            return peerConnections;
+        }
+
+        function isConnectedWith(id) {
+            if (peerConnections[id]) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function addConnection(id, peer) {
+            peerConnections[id] = peer;
+        }
+
+        function getConnection(id) {
+            return peerConnections[id];
+        }
+
+        function deleteConnection(id) {
+            delete peerConnections[id];
+        }
+
     </script>
 {% endblock %}

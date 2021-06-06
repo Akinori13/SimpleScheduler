@@ -1,11 +1,26 @@
 {% extends "common/base.html" %}
 {% load widget_tweaks %}
 
-{% block titele %}Chat Rooms{{ block.super }}{% endblock %}
+{% block titele %}Video Chat{{ block.super }}{% endblock %}
 
 {% block content %}
 {% include "parts/global_navi.html" %}
 <div class="container">
+    <div class="row">
+        <div class="col-12">
+            <form>
+                <div class="mb-2">
+                    <div class="input-group">
+                        <span class="input-group-text">Username</span>
+                        <input type="text" class="form-control" value={{request.user}}>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <button class="btn btn-primary">変更</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <div class="row my-2">
         <div class="col-12 d-flex gap-2">
             <button type="button" onclick="startVideo();" class="btn btn-primary">Start Video</button>
@@ -13,19 +28,15 @@
             <button type="button" onclick="hangUp();" class="btn btn-danger">Hang Up</button>
         </div>
     </div>
-    <div class="row">
+    <div class="row my-2">
         <div class="col-12">
-            <h1>Local Video</h1>
             <div id="local_video_container">
-                <video id="local_video" autoplay muted=true playsInline=true style="width: 160px; height: 120px;" class="rounded"></video>
+                <video id="local_video" autoplay muted=true playsInline=true style="width: 320px; height: 240px;" class="rounded"></video>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-12">
-            <h1>Remote Videos</h1>
-            <div id="remote_videos_container">
-            </div>
+    <div class="row my-2">
+        <div id="remote_videos_container" class="col-12 d-flex gap-2 flex-wrap">
         </div>
     </div>
 
@@ -85,11 +96,10 @@
         ws.onmessage = (evt) => {
             const message = JSON.parse(evt.data);
             if (message.from_uuid === uuid){
-                console.log('sended by me');
                 return;
             }
             if (message.to_uuid === uuid || message.to_uuid === 'every'){
-                console.error(`from: ${message.from_uuid} to: ${message.to_uuid}`)
+                console.log(`from: ${message.from_uuid} to: ${message.to_uuid}`)
                 console.log('ws onmessage() data:', evt.data);
                 switch(message.type){
                     case 'offer': {
@@ -110,14 +120,19 @@
                         break;
                     }
                     case 'close': {
-                        console.log('peer is closed ...');
-                        hangUp();
+                        console.log('Received close ...');
+                        if (isConnectedWith(message.from_uuid)) {
+                            disconnect(message.from_uuid);
+                        }
                         break;
                     }
                     case 'callOffer': {
                         console.log('Received callOffer ...');
                         connect(message.from_uuid)
                         break;
+                    }
+                    case 'message': {
+                        console.log('Received message ...');
                     }
                     default: { 
                         console.log("Invalid message"); 
@@ -195,11 +210,12 @@
                 switch (peer.iceConnectionState) {
                     case 'closed':
                     case 'failed':
-                        if (peerConnection) {
-                            hangUp();
+                        if (isConnectedWith[from_uuid]) {
+                            hangUp()
                         }
                         break;
                     case 'disconnected':
+                        disconnect(from_uuid)
                         break;
                 }
             };
@@ -263,7 +279,6 @@
 
         // Set Offer SDP
         async function setOffer(sessionDescription, from_uuid) {
-            console.log('async')
             if (isConnectedWith(from_uuid)){
                 console.error('connected offer');
             }
@@ -279,8 +294,8 @@
         }
 
         // Set Answer SDP
-        async function setAnswer(sessionDescription, uuid) {
-            let peerConnection = getConnection(uuid);
+        async function setAnswer(sessionDescription, from_uuid) {
+            let peerConnection = getConnection(from_uuid);
             if (! peerConnection) {
                 console.error('peerConnection NOT exist!');
                 return;
@@ -293,23 +308,32 @@
             }
         }
 
-        // Disconnect P2P
-        function hangUp(){
-            if (peerConnection) {
-                if(peerConnection.iceConnectionState !== 'closed'){
-                    peerConnection.close();
-                    peerConnection = null;
-                    negotiationneededCounter = 0;
-                    const message = JSON.stringify({ type: 'close' });
-                    console.log('sending close message');
-                    ws.send(message);
-                    cleanupVideoElement(remoteVideo);
-                    return;
-                }
-            }
-            console.log('peerConnection is closed.');
+        // Hang up
+        function hangUp() {
+            const message = JSON.stringify({ type: 'close', from_uuid: uuid, to_uuid: 'every' });
+            console.log('sending close message');
+            ws.send(message);
+            localVideo.pause();
+            let stream = localVideo.srcObject
+            let tracks = stream.getTracks();
+            tracks.forEach(function(track) {
+                track.stop();
+            });
+
+            localStream = null;
+            localVideo.srcObject = null;
+            return;
         }
 
+        // Disconnect P2P
+        function disconnect(from_uuid) {
+            console.log('disconnecting')
+            let peerConnection = getConnection(from_uuid);
+            peerConnection.close();
+            deleteConnection(from_uuid);
+            let remoteVideo = getRemoteVideoElement(from_uuid);
+            cleanupRemoteVideoElement(remoteVideo);
+        }
 
 
         // ------------------ Media -----------------
@@ -329,6 +353,7 @@
             video.autoplay = true;
             video.muted = true;
             video.playsInline = true;
+            video.className = 'rounded'
             remoteVideosContainer.appendChild(video);
             return video;
         }
@@ -353,12 +378,18 @@
             }
         }
 
-        // Inisialize Video Element
-        function cleanupVideoElement(element) {
-            element.pause();
-            element.srcObject = null;
+        // Cleanup Video Element
+        function cleanupRemoteVideoElement(video) {
+            video.pause();
+            video.srcObject = null;
+            remoteVideosContainer.removeChild(video);
         }
 
-        startVideo();
+        // Get Remote Video Element
+        function getRemoteVideoElement(uuid) {
+            let video = remoteVideos[uuid];
+            delete remoteVideos[uuid];
+            return video;
+        }
     </script>
 {% endblock %}

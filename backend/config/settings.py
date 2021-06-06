@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 
+DJANGO_SETTINGS_MODULE = 'config.settings'
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +27,7 @@ SECRET_KEY = 'django-_8r5taf#h-z+qf9ufo87q8jmmrb@l!e)4a(r#0mxb&4xpl+m^!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-DEBUG_TOOLBAR = False
+DEBUG_TOOLBAR = True
 
 ALLOWED_HOSTS = []
 
@@ -33,8 +35,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'accounts.apps.AccountsConfig',
     'speaks.apps.SpeaksConfig',
+    'video.apps.VideoConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -174,4 +178,13 @@ DEBUG_TOOLBAR_CONFIG = {
     'SHOW_TOOLBAR_CALLBACK': lambda request: True,
 }
 
-DJANGO_SETTINGS_MODULE = 'config.settings'
+# Channels
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('redis', 6379)],
+        },
+    },
+}
+

@@ -1,7 +1,7 @@
 # SimpleScheduler
 ## Architecture
 - Web Server: Nginx
-- AP Server: Gunicorn
+- AP Server: uWsgi / ASGI
 - DB Server: PostgreSQL
 
 **In the future, I will deploy this application to AWS ECS, RDS and S3.**
@@ -11,7 +11,10 @@
 - [x] Profile Function
 - [x] Speak Function (Like Twitter)
 - [x] Password Change and Reset Function
-- [ ] Sign up with one time token Function
+- [x] Sign up with one time token Function
+- [x] Video Chat Function
+- [ ] Organization Function
+- [ ] Group Function
 - [ ] Social Auth Function (GitHub)
 - [ ] Todo Function
 - [ ] Mail ToDo lists Function
@@ -24,9 +27,7 @@
 - [ ] Billing to support Function (stripe)
 - [ ] Search Function (Elasticsearch)
 - [ ] Direct Messages Function
-- [ ] Video Chat Function
 - [ ] Follow Function
-- [ ] Group Function
 - [ ] Matching(Recommend) Function
 - [ ] Virtual Office Function
 - [ ] Kanban Function

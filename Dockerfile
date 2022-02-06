@@ -1,4 +1,4 @@
-FROM python:3.6-stretch
+FROM python:3.9
 ENV PYTHONUNBUFFERED 1
 ENV REDIS_HOST "redis"
 
@@ -7,7 +7,9 @@ WORKDIR /code
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y netcat
+    apt-get install -y \
+    netcat \
+    iputils-ping
 
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt

@@ -9,3 +9,4 @@ django-debug-toolbar
 channels
 channels_redis
 uWSGI
+selenium

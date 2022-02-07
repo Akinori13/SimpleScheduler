@@ -15,13 +15,14 @@
 - [x] Redis
 - [x] ASGI
 - [ ] Celery
-- [ ] Django-rest-framework
-- [ ] Django-rest-swagger
-- [ ] Django-silk
-- [ ] Django-environ
-- [ ] Django-allauth
-- [ ] Django-oauth-toolkit
-- [ ] Django-redis-cache
+- [ ] django-structlog
+- [ ] django-rest-framework
+- [ ] django-rest-swagger
+- [ ] django-silk
+- [ ] django-environ
+- [ ] django-allauth
+- [ ] django-oauth-toolkit
+- [ ] django-redis-cache
 
 ## Functions
 - [x] Signup Function

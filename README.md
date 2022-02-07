@@ -11,6 +11,7 @@
 - [x] Mail
 - [x] Selenium
 - [ ] Beautifulsoup
+- [ ] Sentry
 - [x] Redis
 - [x] ASGI
 - [ ] Celery

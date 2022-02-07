@@ -6,6 +6,22 @@
 
 **In the future, I will deploy this application to AWS ECS, RDS and S3.**
 
+## Other Tools
+- [x] JWT
+- [x] Mail
+- [x] Selenium
+- [ ] Beautifulsoup
+- [x] Redis
+- [x] ASGI
+- [ ] Celery
+- [ ] Django-rest-framework
+- [ ] Django-rest-swagger
+- [ ] Django-silk
+- [ ] Django-environ
+- [ ] Django-allauth
+- [ ] Django-oauth-toolkit
+- [ ] Django-redis-cache
+
 ## Functions
 - [x] Signup Function
 - [x] Profile Function

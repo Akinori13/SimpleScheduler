@@ -6,7 +6,7 @@
 
 **In the future, I will deploy this application to AWS ECS, RDS and S3.**
 
-## Other Tools
+## Other
 - [x] JWT
 - [x] Mail
 - [x] Selenium

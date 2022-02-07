@@ -1,3 +1,6 @@
+import re
+from time import sleep
+
 from django.test import TestCase
 from django.conf import settings
 from django.core import mail
@@ -6,8 +9,6 @@ from django.urls import reverse
 
 from .models import User, Profile
 from .forms import CustomUserCreationForm
-
-import re
 
 
 # Create your tests here.
@@ -39,7 +40,6 @@ class TestSignup(TestCase):
         response = self.get(url=url)
         self.assertTemplateUsed(response, 'registration/signup_complete.html')
         self.assertEqual(User.objects.filter(username='test_post_succeeds').count(), 1)
-        
 
     def test_post_fails_with_password_mismatch(self):
         response = self.post({
@@ -199,3 +199,31 @@ class TestProfile(TestCase):
 
         self.test_user = User.objects.get(username='testuser2')
         self.assertEqual(self.test_user.profile.text, 'HelloWorldTest')
+
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
+
+class SeleniumTests(StaticLiveServerTestCase):
+    def setUp(self):
+        self.test_user = User.objects.create_user(
+            username='testuser',
+            email='test@user.com',
+            password='test_password'
+        )
+
+        options = webdriver.ChromeOptions()
+        self.chrome = webdriver.Remote(
+            command_executor='http://selenium:4444/wd/hub',
+            desired_capabilities=DesiredCapabilities.CHROME,
+            options=options,
+        )
+        self.chrome.implicitly_wait(10)
+
+    def test_login(self):
+        self.chrome.get(f'http://nginx:80/accounts/login/')
+        sleep(80)
+
+    def tearDown(self):
+        self.chrome.quit()

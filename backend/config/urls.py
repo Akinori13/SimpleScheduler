@@ -5,6 +5,7 @@ from django.urls import path, include
 urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('speaks/', include('speaks.urls')),
+    path('scraping/', include('scraping.urls')),
     path('video/', include('video.urls')),
 ]
 

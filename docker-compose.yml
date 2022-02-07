@@ -13,6 +13,7 @@ services:
       - webnet
       - redisnet
       - postgresnet
+      - selenium
     depends_on:
       - redis
       - postgres
@@ -34,7 +35,7 @@ services:
       - redis
       - postgres
     restart: always
-  
+
   nginx:
     container_name: nginx
     image: nginx:1.15.0
@@ -46,8 +47,9 @@ services:
       - ./logs/nginx:/var/log/nginx
     networks:
       - webnet
+      - selenium
     ports:
-      - "80:80"
+      - 80:80
     restart: always
 
   redis:
@@ -72,6 +74,15 @@ services:
       - postgresnet
     restart: always
 
+  selenium:
+    image: selenium/standalone-chrome-debug
+    container_name: 'selenium'
+    ports:
+      - 4444:4444
+      - 5900:5900
+    networks:
+      - selenium
+
 volumes:
   postgres_data:
 
@@ -79,3 +90,4 @@ networks:
   webnet:
   redisnet:
   postgresnet:
+  selenium:

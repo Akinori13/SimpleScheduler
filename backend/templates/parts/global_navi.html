@@ -12,6 +12,10 @@
                 {% menu_link url_accounts_profile_detail request.get_full_path "Profile" %}
             </li>
             <li class="px-2">
+                {% url 'scraping:home' as url_scraping_home %}
+                {% menu_link url_scraping_home request.get_full_path "Scraping" %}
+            </li>
+            <li class="px-2">
                 {% url 'speaks:speak_create' as url_speaks_speak_create %}
                 {% menu_link url_speaks_speak_create request.get_full_path "Speak" %}
             </li>

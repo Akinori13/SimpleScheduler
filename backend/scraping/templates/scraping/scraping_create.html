@@ -1,0 +1,11 @@
+{% extends "common/base.html" %}
+
+{% block titele %}Home{{ block.super }}{% endblock %}
+
+{% block content %}
+{% include "parts/global_navi.html" %}
+
+<div class="container">
+  {% include "parts/basic_form.html" with text="Create" %}
+</div>
+{% endblock %}

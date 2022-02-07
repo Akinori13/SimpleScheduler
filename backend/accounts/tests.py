@@ -217,19 +217,13 @@ class SeleniumTests(StaticLiveServerTestCase):
         self.chrome = webdriver.Remote(
             command_executor='http://selenium:4444/wd/hub',
             desired_capabilities=DesiredCapabilities.CHROME,
-            options=options
+            options=options,
         )
         self.chrome.implicitly_wait(10)
-    
+
     def test_login(self):
-        self.chrome.get('http://nginx:80/accounts/login/')
-        
-        # self.chrome.find_element_by_id("id_username").send_keys('testuser')
-        # self.chrome.find_element_by_id("id_password").send_keys('test_password')
-        
-        # self.chrome.find_element_by_id("submit").click()
-        
-        sleep(10)
-        
+        self.chrome.get(f'http://nginx:80/accounts/login/')
+        sleep(80)
+
     def tearDown(self):
         self.chrome.quit()

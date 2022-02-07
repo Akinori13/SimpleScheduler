@@ -1,15 +1,6 @@
 version: '3.5'
 
 services:
-  selenium:
-    image: selenium/standalone-chrome-debug
-    container_name: 'selenium'
-    ports:
-      - 4444:4444
-      - 5900:5900
-    networks:
-      - selenium
-
   django_wsgi:
     container_name: django_wsgi
     build: .
@@ -58,7 +49,7 @@ services:
       - webnet
       - selenium
     ports:
-      - "80:80"
+      - 80:80
     restart: always
 
   redis:
@@ -82,6 +73,15 @@ services:
     networks:
       - postgresnet
     restart: always
+
+  selenium:
+    image: selenium/standalone-chrome-debug
+    container_name: 'selenium'
+    ports:
+      - 4444:4444
+      - 5900:5900
+    networks:
+      - selenium
 
 volumes:
   postgres_data:

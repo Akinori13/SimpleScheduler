@@ -3,15 +3,16 @@ from django.shortcuts import redirect
 from django.http import HttpResponseBadRequest
 from django.contrib.auth import login
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.urls import reverse
 from django.contrib.sites.shortcuts import get_current_site
+from django.urls import reverse
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
 from django.views.generic import ListView, DetailView, UpdateView, CreateView, TemplateView
 from django.template.loader import render_to_string
 
-from libraries.authentications import OnlyAnonymousUserMixin
 from .forms import CustomUserCreationForm
 from .models import Profile, User
+
+from libraries.authentications import OnlyAnonymousUserMixin
 from speaks.models import Speak
 
 class SignupView(OnlyAnonymousUserMixin, CreateView):

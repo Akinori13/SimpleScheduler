@@ -20,6 +20,10 @@ app-restart:
 	docker-compose build
 	docker-compose up -d
 
+.PHONY: django-exec
+django-exec:
+	docker exec -it django_wsgi bash
+
 .PHONY: ui-tests
 ui-tests:
 	docker exec django_wsgi python manage.py test accounts.tests.SeleniumTests

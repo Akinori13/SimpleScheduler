@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
-import os
 
 DJANGO_SETTINGS_MODULE = 'config.settings'
 
@@ -26,8 +25,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-_8r5taf#h-z+qf9ufo87q8jmmrb@l!e)4a(r#0mxb&4xpl+m^!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-DEBUG_TOOLBAR = False
+DEBUG = True
+DEBUG_TOOLBAR = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -38,6 +37,7 @@ INSTALLED_APPS = [
     'channels',
     'accounts.apps.AccountsConfig',
     'speaks.apps.SpeaksConfig',
+    'scraping.apps.ScrapingConfig',
     'video.apps.VideoConfig',
     'django.contrib.admin',
     'django.contrib.auth',

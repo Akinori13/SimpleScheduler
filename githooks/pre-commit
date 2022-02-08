@@ -1,0 +1,17 @@
+#!/bin/bash
+exec 1>&2
+exec < /dev/tty
+
+CURRENT_BRANCH_NAME=`git branch --show-current`
+PARENT_BRANCH_NAME=`git show-branch | grep '*' | grep -v "$(git branch --show-current)" | head -1 | awk -F'[]~^[]' '{print $2}'`
+
+echo "Current Branch(${CURRENT_BRANCH_NAME}) is checkouted from ${PARENT_BRANCH_NAME}"
+
+echo "This flow is OK? (yes/no): "
+read answer
+case $answer in
+    "yes") exit 0
+    ;;
+    *) echo "abort"; exit 1
+    ;;
+esac

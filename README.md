@@ -6,6 +6,12 @@
 
 **In the future, I will deploy this application to AWS ECS, RDS and S3.**
 
+## SetUp
+### Git Hooks
+```
+make git-hooks
+```
+
 ## Other
 - [x] JWT
 - [x] Mail

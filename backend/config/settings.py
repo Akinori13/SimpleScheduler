@@ -26,7 +26,6 @@ SECRET_KEY = 'django-_8r5taf#h-z+qf9ufo87q8jmmrb@l!e)4a(r#0mxb&4xpl+m^!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-DEBUG_TOOLBAR = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -57,12 +56,21 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'middleware.logger.LoggerMiddleware'
 ]
 
-if DEBUG_TOOLBAR:
-    INSTALLED_APPS += ['debug_toolbar']
-    MIDDLEWARE += ['debug_toolbar.middleware.DebugToolbarMiddleware']
-
+if DEBUG:
+    from django.conf import settings
+    INTERNAL_IPS = ['127.0.0.1']
+    INSTALLED_APPS += [
+        'debug_toolbar'
+    ]
+    MIDDLEWARE += [
+        'debug_toolbar.middleware.DebugToolbarMiddleware'
+    ]
+    DEBUG_TOOLBAR_CONFIG = {    
+        'SHOW_TOOLBAR_CALLBACK': lambda request: settings.DEBUG,
+    }
 
 ROOT_URLCONF = 'config.urls'
 
@@ -162,7 +170,7 @@ AUTH_USER_MODEL = 'accounts.User'
 LOGIN_REDIRECT_URL = 'accounts:home'
 LOGIN_URL = 'accounts:login'
 LOGOUT_REDIRECT_URL = 'accounts:login'
-ACTIVATION_TIMEOUT_SECONDS = 60*60*24
+ACTIVATION_TIMEOUT_SECONDS = 60 * 60 * 24
 
 
 # Mail Settings
@@ -171,19 +179,51 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = '/var/log/django/app-messages'
 
 
-# Django Debug Toolbar
+# Logging
 
-INTERNAL_IPS = ['127.0.0.1']
-DEBUG_TOOLBAR_CONFIG = {
-    'SHOW_TOOLBAR_CALLBACK': lambda request: True,
+LOG_BASE_DIR = Path('/','var', 'log', 'django')
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {'simple': {'format': '%(asctime)s [%(levelname)s] %(message)s'}},
+    'handlers': {
+        'info': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': LOG_BASE_DIR / 'info.log',
+            'formatter': 'simple',
+        },
+        'warning': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': LOG_BASE_DIR / 'warning.log',
+            'formatter': 'simple',
+        },
+        'error': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': LOG_BASE_DIR / 'error.log',
+            'formatter': 'simple',
+        },
+    },
+    'root': {
+        'handlers': ['info', 'warning', 'error'],
+        'level': 'INFO',
+    },
 }
 
+
+# Django Debug Toolbar
+
+
+
 # Channels
+
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('redis', 6379)],
+            'hosts': [('redis', 6379)],
         },
     },
 }

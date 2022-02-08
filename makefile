@@ -1,3 +1,8 @@
+.PHONY: git-hooks
+git-hooks:
+	git config --local core.hooksPath githooks
+	chmod +x githooks
+
 .PHONY: app-up
 app-up:
 	docker-compose up -d

@@ -3,6 +3,7 @@ from django.conf.urls.static import static
 from django.urls import path, include
 
 urlpatterns = [
+    path('', include('welcome.urls')),
     path('accounts/', include('accounts.urls')),
     path('speaks/', include('speaks.urls')),
     path('scraping/', include('scraping.urls')),

@@ -16,6 +16,7 @@ make git-hooks
 - [x] JWT
 - [x] Mail
 - [x] Selenium
+- [ ] locust
 - [ ] Beautifulsoup
 - [ ] Sentry
 - [x] Redis

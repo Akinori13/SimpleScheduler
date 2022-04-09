@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'speaks.apps.SpeaksConfig',
     'scraping.apps.ScrapingConfig',
     'video.apps.VideoConfig',
+    'welcome.apps.WelcomeConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

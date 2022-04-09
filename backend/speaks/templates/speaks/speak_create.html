@@ -10,6 +10,7 @@
     <div class="card w-100">
         <div class="card-body">
             <h2 class="card-title">Speak</h2>
+            <a href="{% url 'speaks:speak_list' %}">Speaks一覧</a>
             <form method="post">
                 {% csrf_token %}
                 

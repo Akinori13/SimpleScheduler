@@ -83,6 +83,33 @@ services:
     networks:
       - selenium
 
+  locust_master:
+    image: locustio/locust
+    container_name: locust_master
+    ports:
+     - 8089:8089
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py -H http://nginx --master
+    networks: 
+      - webnet
+    depends_on:
+      - nginx
+    restart: always
+
+  locust_worker:
+    image: locustio/locust
+    container_name: locust_worker
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py -H http://nginx --worker --master-host=locust_master
+    networks: 
+      - webnet
+    depends_on:
+      - django_asgi
+      - django_wsgi
+    restart: always
+
 volumes:
   postgres_data:
 

@@ -3,6 +3,7 @@ from . import views
 
 app_name = 'speaks'
 urlpatterns = [
+    path('', views.SpeakListView.as_view(), name='speak_list'),
     path('new/', views.SpeakCreateView.as_view(), name='speak_create'),
     path('<pk>/', views.SpeakReadView.as_view(), name='speak_read'),
     path('<pk>/update', views.SpeakUpdateView.as_view(), name='speak_update'),

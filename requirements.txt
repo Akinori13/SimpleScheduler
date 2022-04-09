@@ -10,3 +10,4 @@ channels
 channels_redis
 uWSGI
 selenium
+locustio

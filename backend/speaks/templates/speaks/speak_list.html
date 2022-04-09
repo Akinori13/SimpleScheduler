@@ -1,0 +1,17 @@
+{% extends "common/base.html" %}
+{% load widget_tweaks %}
+
+{% block titele %}Speaks一覧{{ block.super }}{% endblock %}
+
+{% block content %}
+{% include "parts/global_navi.html" %}
+
+<div class="container">
+    <div class="row">
+        {% include "parts/speak_list.html" with speaks=speaks %}
+    </div>
+    <div class="row">
+        {% include "parts/pagination.html" %}
+    </div>
+</div>
+{% endblock %}
